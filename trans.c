@@ -262,6 +262,7 @@ void newRecord(FILE *fPtr)
 unsigned int enterChoice(void)
 {
     unsigned int menuChoice; // variable to store user's choice
+    int status;
     // display available options
     printf("%s", "\nEnter your choice\n"
                  "1 - store a formatted text file of accounts called\n"
@@ -275,7 +276,16 @@ unsigned int enterChoice(void)
                  "8 - search accounts by last name\n"
                  "9 - end program\n? ");
 
-    scanf("%u", &menuChoice); // receive choice from user
+    status = scanf("%u", &menuChoice); // receive choice from user
+    
+    // Clear input buffer if the user enters a non-integer (prevents infinite loop)
+    while (status != 1)
+    {
+        while (getchar() != '\n'); // discard remaining characters in the buffer
+        printf("Invalid input. Please enter a number: ");
+        status = scanf("%u", &menuChoice);
+    }
+
     return menuChoice;
 } // end function enterChoice
 
