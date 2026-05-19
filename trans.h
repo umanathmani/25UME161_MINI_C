@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h> // Required for strcmp
 
+#define MAX_ACCOUNTS 100 // Maximum number of accounts
+
 // clientData structure definition
 struct clientData
 {

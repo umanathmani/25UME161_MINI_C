@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
         {
             // Initialize the newly created file with 100 blank records
             struct clientData blankClient = {0, "", "", 0.0};
-            for (unsigned int i = 1; i <= 100; ++i) 
+            for (unsigned int i = 1; i <= MAX_ACCOUNTS; ++i) 
             {
                 fwrite(&blankClient, sizeof(struct clientData), 1, cfPtr);
             }
@@ -130,10 +130,10 @@ void updateRecord(FILE *fPtr)
     struct clientData client = {0, "", "", 0.0};
 
     // obtain number of account to update
-    printf("%s", "Enter account to update ( 1 - 100 ): ");
+    printf("Enter account to update ( 1 - %d ): ", MAX_ACCOUNTS);
     scanf("%u", &account);
 
-    if (account >= 1 && account <= 100)
+    if (account >= 1 && account <= MAX_ACCOUNTS)
     {
         // move file pointer to correct record in file
         fseek(fPtr, (account - 1) * sizeof(struct clientData), SEEK_SET);
@@ -176,10 +176,10 @@ void deleteRecord(FILE *fPtr)
     unsigned int accountNum;                        // account number
 
     // obtain number of account to delete
-    printf("%s", "Enter account number to delete ( 1 - 100 ): ");
+    printf("Enter account number to delete ( 1 - %d ): ", MAX_ACCOUNTS);
     scanf("%u", &accountNum);
 
-    if (accountNum >= 1 && accountNum <= 100)
+    if (accountNum >= 1 && accountNum <= MAX_ACCOUNTS)
     {
         // move file pointer to correct record in file
         fseek(fPtr, (accountNum - 1) * sizeof(struct clientData), SEEK_SET);
@@ -212,10 +212,10 @@ void newRecord(FILE *fPtr)
     unsigned int accountNum; // account number
 
     // obtain number of account to create
-    printf("%s", "Enter new account number ( 1 - 100 ): ");
+    printf("Enter new account number ( 1 - %d ): ", MAX_ACCOUNTS);
     scanf("%u", &accountNum);
 
-    if (accountNum >= 1 && accountNum <= 100)
+    if (accountNum >= 1 && accountNum <= MAX_ACCOUNTS)
     {
         // move file pointer to correct record in file
         fseek(fPtr, (accountNum - 1) * sizeof(struct clientData), SEEK_SET);
@@ -282,10 +282,10 @@ void viewAccount(FILE *fPtr)
     struct clientData client = {0, "", "", 0.0};
     unsigned int account;
 
-    printf("%s", "Enter account number to view ( 1 - 100 ): ");
+    printf("Enter account number to view ( 1 - %d ): ", MAX_ACCOUNTS);
     scanf("%u", &account);
 
-    if (account >= 1 && account <= 100)
+    if (account >= 1 && account <= MAX_ACCOUNTS)
     {
         fseek(fPtr, (account - 1) * sizeof(struct clientData), SEEK_SET);
         fread(&client, sizeof(struct clientData), 1, fPtr);
@@ -334,10 +334,10 @@ void transferFunds(FILE *fPtr)
     unsigned int srcAccount, destAccount;
     double amount;
 
-    printf("%s", "Enter sender account number ( 1 - 100 ): ");
+    printf("Enter sender account number ( 1 - %d ): ", MAX_ACCOUNTS);
     scanf("%u", &srcAccount);
 
-    if (srcAccount < 1 || srcAccount > 100)
+    if (srcAccount < 1 || srcAccount > MAX_ACCOUNTS)
     {
         printf("Invalid sender account number.\n");
         return;
@@ -352,10 +352,10 @@ void transferFunds(FILE *fPtr)
         return;
     }
 
-    printf("%s", "Enter receiver account number ( 1 - 100 ): ");
+    printf("Enter receiver account number ( 1 - %d ): ", MAX_ACCOUNTS);
     scanf("%u", &destAccount);
 
-    if (destAccount < 1 || destAccount > 100)
+    if (destAccount < 1 || destAccount > MAX_ACCOUNTS)
     {
         printf("Invalid receiver account number.\n");
         return;
