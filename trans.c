@@ -33,6 +33,16 @@ int main(int argc, char *argv[])
             printf("%s: File could not be opened or created.\n", argv[0]);
             exit(-1);
         }
+        else 
+        {
+            // Initialize the newly created file with 100 blank records
+            struct clientData blankClient = {0, "", "", 0.0};
+            for (unsigned int i = 1; i <= 100; ++i) 
+            {
+                fwrite(&blankClient, sizeof(struct clientData), 1, cfPtr);
+            }
+            rewind(cfPtr); // Reset pointer to beginning of file
+        }
     }
 
     // enable user to specify action
