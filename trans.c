@@ -93,6 +93,15 @@ int main(int argc, char *argv[])
             puts("Incorrect choice");
             break;
         } // end switch
+
+        // Pause and clear the screen for a cleaner user experience
+        if (choice != 9)
+        {
+            printf("\n");
+            system("pause");
+            system("cls");
+        }
+
     }     // end while
 
     fclose(cfPtr); // fclose closes the file
