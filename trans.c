@@ -3,6 +3,8 @@
 // be placed in the file, and deletes data previously in the file.
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h> // Required for strcmp
+
 // clientData structure definition
 struct clientData
 {
@@ -395,8 +397,6 @@ void transferFunds(FILE *fPtr)
     printf("Transfer successful! Sender New Balance: %.2f | Receiver New Balance: %.2f\n", 
            srcClient.balance, destClient.balance);
 } // end function transferFunds
-
-#include <string.h> // Required for strcmp
 
 // search for accounts by last name
 void searchByName(FILE *fPtr)
