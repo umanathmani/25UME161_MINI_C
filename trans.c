@@ -27,8 +27,12 @@ int main(int argc, char *argv[])
     // fopen opens the file; exits if file cannot be opened
     if ((cfPtr = fopen("credit.dat", "rb+")) == NULL)
     {
-        printf("%s: File could not be opened.\n", argv[0]);
-        exit(-1);
+        // Try creating the file if it doesn't exist
+        if ((cfPtr = fopen("credit.dat", "wb+")) == NULL)
+        {
+            printf("%s: File could not be opened or created.\n", argv[0]);
+            exit(-1);
+        }
     }
 
     // enable user to specify action
@@ -60,6 +64,7 @@ int main(int argc, char *argv[])
     }     // end while
 
     fclose(cfPtr); // fclose closes the file
+    return 0;      // indicate successful termination
 } // end main
 
 // create formatted text file for printing
