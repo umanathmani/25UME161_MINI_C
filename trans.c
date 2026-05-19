@@ -21,6 +21,7 @@ void deleteRecord(FILE *fPtr);
 void viewAccount(FILE *fPtr);
 void listAccounts(FILE *fPtr);
 void transferFunds(FILE *fPtr);
+void searchByName(FILE *fPtr);
 
 int main(int argc, char *argv[])
 {
@@ -49,7 +50,7 @@ int main(int argc, char *argv[])
     }
 
     // enable user to specify action
-    while ((choice = enterChoice()) != 8)
+    while ((choice = enterChoice()) != 9)
     {
         switch (choice)
         {
@@ -80,6 +81,10 @@ int main(int argc, char *argv[])
         // transfer funds
         case 7:
             transferFunds(cfPtr);
+            break;
+        // search by last name
+        case 8:
+            searchByName(cfPtr);
             break;
         // display if user does not select valid choice
         default:
@@ -265,7 +270,8 @@ unsigned int enterChoice(void)
                  "5 - view specific account details\n"
                  "6 - list all active accounts\n"
                  "7 - transfer funds between accounts\n"
-                 "8 - end program\n? ");
+                 "8 - search accounts by last name\n"
+                 "9 - end program\n? ");
 
     scanf("%u", &menuChoice); // receive choice from user
     return menuChoice;
@@ -389,3 +395,40 @@ void transferFunds(FILE *fPtr)
     printf("Transfer successful! Sender New Balance: %.2f | Receiver New Balance: %.2f\n", 
            srcClient.balance, destClient.balance);
 } // end function transferFunds
+
+#include <string.h> // Required for strcmp
+
+// search for accounts by last name
+void searchByName(FILE *fPtr)
+{
+    struct clientData client = {0, "", "", 0.0};
+    char searchName[15];
+    int found = 0;
+    int result;
+
+    printf("Enter last name to search for: ");
+    scanf("%14s", searchName);
+
+    printf("\n%-6s%-16s%-11s%10s\n", "Acct", "Last Name", "First Name", "Balance");
+    rewind(fPtr); // start from beginning of file
+
+    while (!feof(fPtr))
+    {
+        result = fread(&client, sizeof(struct clientData), 1, fPtr);
+
+        if (result != 0 && client.acctNum != 0)
+        {
+            // Using strcmp to find exact matches
+            if (strcmp(client.lastName, searchName) == 0)
+            {
+                printf("%-6u%-16s%-11s%10.2f\n", client.acctNum, client.lastName, client.firstName, client.balance);
+                found = 1;
+            }
+        }
+    }
+
+    if (!found)
+    {
+        printf("No accounts found with last name: %s\n", searchName);
+    }
+} // end function searchByName
