@@ -1,29 +1,7 @@
 // Bank-account program reads a random-access file sequentially,
 // updates data already written to the file, creates new data to
 // be placed in the file, and deletes data previously in the file.
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h> // Required for strcmp
-
-// clientData structure definition
-struct clientData
-{
-    unsigned int acctNum; // account number
-    char lastName[15];    // account last name
-    char firstName[10];   // account first name
-    double balance;       // account balance
-};                        // end structure clientData
-
-// prototypes
-unsigned int enterChoice(void);
-void textFile(FILE *readPtr);
-void updateRecord(FILE *fPtr);
-void newRecord(FILE *fPtr);
-void deleteRecord(FILE *fPtr);
-void viewAccount(FILE *fPtr);
-void listAccounts(FILE *fPtr);
-void transferFunds(FILE *fPtr);
-void searchByName(FILE *fPtr);
+#include "trans.h"
 
 int main(int argc, char *argv[])
 {
