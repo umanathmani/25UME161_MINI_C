@@ -109,32 +109,39 @@ void updateRecord(FILE *fPtr)
     printf("%s", "Enter account to update ( 1 - 100 ): ");
     scanf("%u", &account);
 
-    // move file pointer to correct record in file
-    fseek(fPtr, (account - 1) * sizeof(struct clientData), SEEK_SET);
-    // read record from file
-    fread(&client, sizeof(struct clientData), 1, fPtr);
-    // display error if account does not exist
-    if (client.acctNum == 0)
+    if (account >= 1 && account <= 100)
     {
-        printf("Account #%u has no information.\n", account);
+        // move file pointer to correct record in file
+        fseek(fPtr, (account - 1) * sizeof(struct clientData), SEEK_SET);
+        // read record from file
+        fread(&client, sizeof(struct clientData), 1, fPtr);
+        // display error if account does not exist
+        if (client.acctNum == 0)
+        {
+            printf("Account #%u has no information.\n", account);
+        }
+        else
+        { // update record
+            printf("%-6u%-16s%-11s%10.2f\n\n", client.acctNum, client.lastName, client.firstName, client.balance);
+
+            // request transaction amount from user
+            printf("%s", "Enter charge ( + ) or payment ( - ): ");
+            scanf("%lf", &transaction);
+            client.balance += transaction; // update record balance
+
+            printf("%-6u%-16s%-11s%10.2f\n", client.acctNum, client.lastName, client.firstName, client.balance);
+
+            // move file pointer to correct record in file
+            // move back by 1 record length
+            fseek(fPtr, - (long) sizeof(struct clientData), SEEK_CUR);
+            // write updated record over old record in file
+            fwrite(&client, sizeof(struct clientData), 1, fPtr);
+        } // end else
     }
     else
-    { // update record
-        printf("%-6u%-16s%-11s%10.2f\n\n", client.acctNum, client.lastName, client.firstName, client.balance);
-
-        // request transaction amount from user
-        printf("%s", "Enter charge ( + ) or payment ( - ): ");
-        scanf("%lf", &transaction);
-        client.balance += transaction; // update record balance
-
-        printf("%-6u%-16s%-11s%10.2f\n", client.acctNum, client.lastName, client.firstName, client.balance);
-
-        // move file pointer to correct record in file
-        // move back by 1 record length
-        fseek(fPtr, - (long) sizeof(struct clientData), SEEK_CUR);
-        // write updated record over old record in file
-        fwrite(&client, sizeof(struct clientData), 1, fPtr);
-    } // end else
+    {
+        printf("Invalid account number.\n");
+    }
 } // end function updateRecord
 
 // delete an existing record
@@ -148,22 +155,29 @@ void deleteRecord(FILE *fPtr)
     printf("%s", "Enter account number to delete ( 1 - 100 ): ");
     scanf("%u", &accountNum);
 
-    // move file pointer to correct record in file
-    fseek(fPtr, (accountNum - 1) * sizeof(struct clientData), SEEK_SET);
-    // read record from file
-    fread(&client, sizeof(struct clientData), 1, fPtr);
-    // display error if record does not exist
-    if (client.acctNum == 0)
+    if (accountNum >= 1 && accountNum <= 100)
     {
-        printf("Account %u does not exist.\n", accountNum);
-    } // end if
-    else
-    { // delete record
         // move file pointer to correct record in file
         fseek(fPtr, (accountNum - 1) * sizeof(struct clientData), SEEK_SET);
-        // replace existing record with blank record
-        fwrite(&blankClient, sizeof(struct clientData), 1, fPtr);
-    } // end else
+        // read record from file
+        fread(&client, sizeof(struct clientData), 1, fPtr);
+        // display error if record does not exist
+        if (client.acctNum == 0)
+        {
+            printf("Account %u does not exist.\n", accountNum);
+        } // end if
+        else
+        { // delete record
+            // move file pointer to correct record in file
+            fseek(fPtr, (accountNum - 1) * sizeof(struct clientData), SEEK_SET);
+            // replace existing record with blank record
+            fwrite(&blankClient, sizeof(struct clientData), 1, fPtr);
+        } // end else
+    }
+    else
+    {
+        printf("Invalid account number.\n");
+    }
 } // end function deleteRecord
 
 // create and insert record
@@ -177,27 +191,34 @@ void newRecord(FILE *fPtr)
     printf("%s", "Enter new account number ( 1 - 100 ): ");
     scanf("%u", &accountNum);
 
-    // move file pointer to correct record in file
-    fseek(fPtr, (accountNum - 1) * sizeof(struct clientData), SEEK_SET);
-    // read record from file
-    fread(&client, sizeof(struct clientData), 1, fPtr);
-    // display error if account already exists
-    if (client.acctNum != 0)
+    if (accountNum >= 1 && accountNum <= 100)
     {
-        printf("Account #%u already contains information.\n", client.acctNum);
-    } // end if
-    else
-    { // create record
-        // user enters last name, first name and balance
-        printf("%s", "Enter lastname, firstname, balance\n? ");
-        scanf("%14s%9s%lf", client.lastName, client.firstName, &client.balance);
-
-        client.acctNum = accountNum;
         // move file pointer to correct record in file
-        fseek(fPtr, (client.acctNum - 1) * sizeof(struct clientData), SEEK_SET);
-        // insert record in file
-        fwrite(&client, sizeof(struct clientData), 1, fPtr);
-    } // end else
+        fseek(fPtr, (accountNum - 1) * sizeof(struct clientData), SEEK_SET);
+        // read record from file
+        fread(&client, sizeof(struct clientData), 1, fPtr);
+        // display error if account already exists
+        if (client.acctNum != 0)
+        {
+            printf("Account #%u already contains information.\n", client.acctNum);
+        } // end if
+        else
+        { // create record
+            // user enters last name, first name and balance
+            printf("%s", "Enter lastname, firstname, balance\n? ");
+            scanf("%14s%9s%lf", client.lastName, client.firstName, &client.balance);
+
+            client.acctNum = accountNum;
+            // move file pointer to correct record in file
+            fseek(fPtr, (client.acctNum - 1) * sizeof(struct clientData), SEEK_SET);
+            // insert record in file
+            fwrite(&client, sizeof(struct clientData), 1, fPtr);
+        } // end else
+    }
+    else
+    {
+        printf("Invalid account number.\n");
+    }
 } // end function newRecord
 
 // enable user to input menu choice
