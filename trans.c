@@ -18,6 +18,9 @@ void textFile(FILE *readPtr);
 void updateRecord(FILE *fPtr);
 void newRecord(FILE *fPtr);
 void deleteRecord(FILE *fPtr);
+void viewAccount(FILE *fPtr);
+void listAccounts(FILE *fPtr);
+void transferFunds(FILE *fPtr);
 
 int main(int argc, char *argv[])
 {
@@ -46,7 +49,7 @@ int main(int argc, char *argv[])
     }
 
     // enable user to specify action
-    while ((choice = enterChoice()) != 5)
+    while ((choice = enterChoice()) != 8)
     {
         switch (choice)
         {
@@ -65,6 +68,18 @@ int main(int argc, char *argv[])
         // delete existing record
         case 4:
             deleteRecord(cfPtr);
+            break;
+        // view an account
+        case 5:
+            viewAccount(cfPtr);
+            break;
+        // list all accounts
+        case 6:
+            listAccounts(cfPtr);
+            break;
+        // transfer funds
+        case 7:
+            transferFunds(cfPtr);
             break;
         // display if user does not select valid choice
         default:
@@ -247,8 +262,130 @@ unsigned int enterChoice(void)
                  "2 - update an account\n"
                  "3 - add a new account\n"
                  "4 - delete an account\n"
-                 "5 - end program\n? ");
+                 "5 - view specific account details\n"
+                 "6 - list all active accounts\n"
+                 "7 - transfer funds between accounts\n"
+                 "8 - end program\n? ");
 
     scanf("%u", &menuChoice); // receive choice from user
     return menuChoice;
 } // end function enterChoice
+
+// view specific account details
+void viewAccount(FILE *fPtr)
+{
+    struct clientData client = {0, "", "", 0.0};
+    unsigned int account;
+
+    printf("%s", "Enter account number to view ( 1 - 100 ): ");
+    scanf("%u", &account);
+
+    if (account >= 1 && account <= 100)
+    {
+        fseek(fPtr, (account - 1) * sizeof(struct clientData), SEEK_SET);
+        fread(&client, sizeof(struct clientData), 1, fPtr);
+
+        if (client.acctNum == 0)
+        {
+            printf("Account #%u has no information.\n", account);
+        }
+        else
+        {
+            printf("\n%-6s%-16s%-11s%10s\n", "Acct", "Last Name", "First Name", "Balance");
+            printf("%-6u%-16s%-11s%10.2f\n", client.acctNum, client.lastName, client.firstName, client.balance);
+        }
+    }
+    else
+    {
+        printf("Invalid account number.\n");
+    }
+} // end function viewAccount
+
+// list all active accounts to the screen
+void listAccounts(FILE *fPtr)
+{
+    struct clientData client = {0, "", "", 0.0};
+    int result;
+
+    printf("\n%-6s%-16s%-11s%10s\n", "Acct", "Last Name", "First Name", "Balance");
+    rewind(fPtr); // start from beginning of file
+
+    while (!feof(fPtr))
+    {
+        result = fread(&client, sizeof(struct clientData), 1, fPtr);
+
+        if (result != 0 && client.acctNum != 0)
+        {
+            printf("%-6u%-16s%-11s%10.2f\n", client.acctNum, client.lastName, client.firstName, client.balance);
+        }
+    }
+} // end function listAccounts
+
+// transfer funds between two accounts
+void transferFunds(FILE *fPtr)
+{
+    struct clientData srcClient = {0, "", "", 0.0};
+    struct clientData destClient = {0, "", "", 0.0};
+    unsigned int srcAccount, destAccount;
+    double amount;
+
+    printf("%s", "Enter sender account number ( 1 - 100 ): ");
+    scanf("%u", &srcAccount);
+
+    if (srcAccount < 1 || srcAccount > 100)
+    {
+        printf("Invalid sender account number.\n");
+        return;
+    }
+
+    fseek(fPtr, (srcAccount - 1) * sizeof(struct clientData), SEEK_SET);
+    fread(&srcClient, sizeof(struct clientData), 1, fPtr);
+
+    if (srcClient.acctNum == 0)
+    {
+        printf("Sender account #%u has no information.\n", srcAccount);
+        return;
+    }
+
+    printf("%s", "Enter receiver account number ( 1 - 100 ): ");
+    scanf("%u", &destAccount);
+
+    if (destAccount < 1 || destAccount > 100)
+    {
+        printf("Invalid receiver account number.\n");
+        return;
+    }
+
+    fseek(fPtr, (destAccount - 1) * sizeof(struct clientData), SEEK_SET);
+    fread(&destClient, sizeof(struct clientData), 1, fPtr);
+
+    if (destClient.acctNum == 0)
+    {
+        printf("Receiver account #%u has no information.\n", destAccount);
+        return;
+    }
+
+    printf("Enter transfer amount: ");
+    scanf("%lf", &amount);
+
+    if (amount <= 0 || amount > srcClient.balance)
+    {
+        printf("Invalid or insufficient funds for transfer.\n");
+        return;
+    }
+
+    // Process the transfer
+    srcClient.balance -= amount;
+    destClient.balance += amount;
+
+    // Save sender record
+    fseek(fPtr, (srcAccount - 1) * sizeof(struct clientData), SEEK_SET);
+    fwrite(&srcClient, sizeof(struct clientData), 1, fPtr);
+
+    // Save receiver record
+    fseek(fPtr, (destAccount - 1) * sizeof(struct clientData), SEEK_SET);
+    fwrite(&destClient, sizeof(struct clientData), 1, fPtr);
+
+    printf("Transfer successful! Sender New Balance: %.2f | Receiver New Balance: %.2f\n", 
+           srcClient.balance, destClient.balance);
+} // end function transferFunds
